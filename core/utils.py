@@ -9,7 +9,7 @@
 import csv
 import os
 from shutil import copyfile
-
+from tqdm import tqdm
 # defaults
 DEFAULT_LABEL_FILE = '../data/class_labels_indices.csv'
 DEFAULT_CSV_DATASET = '../data/unbalanced_train_segments.csv'
@@ -28,7 +28,8 @@ def find(class_name, args):
 
     class_id = get_label_id(class_name, args)  # Get ID corresponding to class_name
     youtube_ids = get_yt_ids(class_id, csv_dataset)  # Find all YouTube IDs which have class_id as a label
-    find_files(youtube_ids, args.audio_data_dir, dst_dir_path)  # Find all files in audio_data_dir which are in the list of YouTube IDs
+    find_files(youtube_ids, args.audio_data_dir,
+               dst_dir_path)  # Find all files in audio_data_dir which are in the list of YouTube IDs
 
 
 def download(class_name, args):
@@ -46,14 +47,18 @@ def download(class_name, args):
     with open(new_csv) as dataset:
         reader = csv.reader(dataset)
 
-        for row in reader:
+        for row in tqdm(reader):
             # print command for debugging
-            print("ffmpeg -ss " + str(row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
-                       str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[1] + ".wav\"")
-            os.system(("ffmpeg -ss " + str(row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
-                       str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[1] + ".wav\""))
+            # print("ffmpeg -ss " + str(row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
+            #            str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[1] + ".wav\"")
+            # os.system(("ffmpeg -ss " + str(
+            #     row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
+            #            str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[
+            #                1] + ".wav\""))
+            # print("youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" + str(row[0]))
 
-
+            os.system("youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" + str(row[0]))
+            # break
 def create_csv(class_name, args):
     """
     Function for creating csv file containing all clips and corresponding info for given class
@@ -77,8 +82,10 @@ def create_csv(class_name, args):
     label_id = get_label_id(class_name, args)  # Get a list of label IDs which match class_name
 
     if args.blacklist != None:
-        blacklisted_ids = [get_label_id(blacklisted_class, args) for blacklisted_class in args.blacklist ] # Get a list of label IDs for blacklisted classes
-        blacklisted_ids = [id for blacklist in blacklisted_ids for id in blacklist]  # Flatten list of lists into a single list
+        blacklisted_ids = [get_label_id(blacklisted_class, args) for blacklisted_class in
+                           args.blacklist]  # Get a list of label IDs for blacklisted classes
+        blacklisted_ids = [id for blacklist in blacklisted_ids for id in
+                           blacklist]  # Flatten list of lists into a single list
     else:
         blacklisted_ids = []
 
@@ -88,7 +95,8 @@ def create_csv(class_name, args):
 
         #  Include the row if it contains label for desired class and no labels of blacklisted classes
         to_write = [row for row in reader for label in label_id if label in row[3]
-                    and bool(set(row[3].split(",")).intersection(blacklisted_ids)) is False]  # added check for blacklisted classes
+                    and bool(
+            set(row[3].split(",")).intersection(blacklisted_ids)) is False]  # added check for blacklisted classes
         writer.writerows(to_write)
 
     print("Finished writing CSV file for " + class_name)
@@ -128,7 +136,7 @@ def get_label_id(class_name, args):
         if label_ids is None:
             print("No id for class " + class_name)
 
-        elif len(label_ids) > 1: # If there is more than one class containing the specified string
+        elif len(label_ids) > 1:  # If there is more than one class containing the specified string
             print("Multiple labels found for " + class_name)
             print(label_ids)
 
@@ -194,6 +202,7 @@ def find_files(yt_ids, file_dir, dst_dir=None):
                 copyfile(src, dst)  # copy file into directory for current label
 
     print("Finished sorting files")
+
 
 """
     Don't call this file directly from terminal....
