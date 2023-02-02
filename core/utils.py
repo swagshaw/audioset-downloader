@@ -10,6 +10,7 @@ import csv
 import os
 from shutil import copyfile
 from tqdm import tqdm
+
 # defaults
 DEFAULT_LABEL_FILE = '../data/class_labels_indices.csv'
 DEFAULT_CSV_DATASET = '../data/unbalanced_train_segments.csv'
@@ -51,14 +52,16 @@ def download(class_name, args):
             # print command for debugging
             # print("ffmpeg -ss " + str(row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
             #            str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[1] + ".wav\"")
-            # os.system(("ffmpeg -ss " + str(
-            #     row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
-            #            str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[
-            #                1] + ".wav\""))
+            os.system(("ffmpeg -ss " + str(
+                row[1]) + " -t 10 -i $(youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" +
+                       str(row[0]) + ") -ar " + str(DEFAULT_FS) + " -- \"" + dst_dir + "/" + str(row[0]) + "_" + row[
+                           1] + ".wav\""))
             # print("youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" + str(row[0]))
 
-            os.system("youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" + str(row[0]))
+            # os.system("youtube-dl -f 'bestaudio' -g https://www.youtube.com/watch?v=" + str(row[0]))
             # break
+
+
 def create_csv(class_name, args):
     """
     Function for creating csv file containing all clips and corresponding info for given class
@@ -121,7 +124,8 @@ def get_label_id(class_name, args):
     :return: ID for given label. Given as a list as there can be multiple matching IDs found (e.g. "dog")
     """
 
-    label_file_path = args.label_file if args.label_file is not None else DEFAULT_LABEL_FILE
+    # label_file_path = args.label_file if args.label_file is not None else DEFAULT_LABEL_FILE
+    label_file_path = "/home/xiaoyang/audioset-downloader/data/class_labels_indices.csv"
 
     with open(label_file_path) as label_file:
         reader = csv.DictReader(label_file)
