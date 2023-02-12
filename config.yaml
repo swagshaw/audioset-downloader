@@ -1,0 +1,6 @@
+labels: ["Knock", "Baby cry, infant cry", "Fire alarm", "Fire", "Smoke detector, smoke alarm", "Car alarm", "Crash", "Breaking", "Bark", "Groan", "Screaming", "Alarm", "Gunshot"]
+label_file: './data/class_labels_indices.csv'
+csv_dataset: './data/unbalanced_train_segments.csv'
+workspace: './core'
+destination_dir: './output'
+fs: 16000
