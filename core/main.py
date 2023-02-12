@@ -1,20 +1,22 @@
 import argparse
+import csv
 import os
+import warnings
 
-import hydra
 from omegaconf import OmegaConf
 
 import pandas as pd
 
 
 def class_to_id(cfg):
-    label_class_dict = pd.read_csv(os.path.join(cfg.workspace, "class_labels_indices.csv"), sep=',')
-    print(label_class_dict.head())
+    label_class_dict = pd.read_csv(os.path.join(cfg.workspace, "class_labels_indices.csv")).to_dict()
     label_dict = {}
     for label in cfg.labels:
-        label_id = label_class_dict.loc[label.lower() in label_class_dict['display_name'].lower()]['display_name']
-        assert len(label_id) == 1, "Can not find the label id or multiple label id of {}.".format(label)
+        label_id = [label_class_dict['mid'].get(key) for key, value in label_class_dict['display_name'].items() if
+                    (label.lower() in value.lower())]
         label_dict[label] = label_id
+        if len(label_id) != 1:
+            print(f'Expect one id but find {label} has {label_id}.')
     return label_dict
 
 
@@ -31,9 +33,8 @@ def create_tsv(cfg):
     df = pd.concat([df_train, df_eval])
     print("Total rows are {}".format(len(df)))
     print("The Candidate labels are: {}".format(cfg.labels))
-    for label in cfg.labels:
-        assert label in label_class_dict['display_name'].unique(), "Can not find the label {} in the metadata".format(
-            label)
+    # for label in cfg.labels:
+
     print("Start extract...")
 
 
