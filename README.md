@@ -1,87 +1,60 @@
-# audioset-processing [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aoifemcdonagh/audioset-processing/blob/master/demo.ipynb)
-Toolkit for downloading raw audio files from AudioSet.
+# audioset-downloader 
+This repository provides a tool to download strong label audio clips from AudioSet, a large-scale dataset of annotated audio events. The tool can be used to build custom strong label audio datasets for machine learning tasks.
 
-## Dependencies
+## Features
+- Efficiently download audio files from AudioSet based on specific labels.
+- Supports multiple parallel downloads to speed up the process.
+- Flexibility to choose the number of audio files to download per label.
+- Convenient logging system to keep track of the downloading process.
+- Configuration of the downloading process can be done through a `config.yaml` file.
+## Requirements
 - python3
 - ffmpeg
-- youtube-dl 2019.7.2
+- youtube-dl 
 
-## Quick start
+## Usage
+1. Clone this repository:
 
-To download files from AudioSet for class "bird" 
-```	
-python3 process.py download -c "bird"
+```bash
+git clone https://github.com/your-username/audioset-downloader.git
 ```
-Downloads audio files to a folder `output/bird` in current directory.
 
-Uses CSV files found in `data/` by default. Execute `process.py` in its' own directory.
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+3. Run the `input_label.py` script to generate the label dictionary:
+```bash
+python input_label.py
+```
+4. Open the config.yaml file and paste the label dictionary that was generated in the previous step. Modify the other fields in the file as desired.
 
-## process.py Arguments
-The following options control how the toolkit operates. The first list of options are the most useful. The second list of options aren't necessary to use but offer more fine grained control if desired.
+5. Run the main.py script to download audio clips: Downloads audio files to a folder `output/dataset` in current directory.
+```bash
+python main.py
+```
+Uses CSV files found in `core/` by default. Execute `process.py` in its' own directory.
 
-#### Most useful
-- Mode: `download` or `find`
-- `-c` or `--classes` List of classes to download (or find). Use quotation marks for class names with spaces, e.g. `"bird song"`. For multiple classes use format `"bird" "flute" "dog" ...` 
-- `-d` or `--destination_dir` Path to directory for storing downloaded (or found) files. Defaults to `./output`
-- `--audio_data_dir` Path to directory containing pre-downloaded AudioSet files. Must be used in `find` mode.
+## Configuration
+The configuration of the tool is specified in the config.yaml file. The following fields are available:
 
-#### Less used
-- `-b` or `--blacklist` List of class labels which will exclude a file from being downloaded/found.
-- `-fs` or `--sample_rate` Sample rate of audio to download in Hz (not kHz!!). Default is 16000Hz
-- `-s` or `--strict` If used, only download/find classes which match exact string arguments passed, i.e. no substring matching. For example, if you wanted to download all instances of class "bird" but not "bird song".
-- `--label_file` Path to CSV file containing AudioSet labels for each class. Defaults to `./data/class_labels_indices.csv` 
-- `--csv_dataset` Path to CSV file containing AudioSet in YouTube-ID/timestamp/class form. Defaults to `./data/balanced_train_segments.csv`
+- `labels`: List of labels to download.
+- `labels_id_dict`: Dictionary mapping labels to AudioSet IDs.
+- `csv_dataset`: Path to the CSV dataset.
+- `workspace`: Workspace directory.
+- `destination_dir`: Destination directory for the downloaded audio files.
+- `fs`: Sampling frequency.
+- `eval_rate`: Evaluation rate.
+- `num_threads`: Number of threads to use when downloading.
 
-## Project Overview
-This toolkit was developed as part of a project for my Master's thesis. This project involved training a WaveGAN model on subsets of the AudioSet dataset.  
+## Why a downloader for AudioSet is needed
 
-AudioSet is publicly available in two formats; as a list of YouTube-IDs structured as CSV files, or as 128-dimensional feature vectors stored as TFRecord files.
-Neither of these formats could be used as training data for the model I was trying to train.
-* The problem with using the dataset's audio feature vectors is that in general, audio feature representations are not invertible.
-* The problem with using YouTube-IDs is that they are only references to where the audio can be found online, not the samples themselves.
+Exactly, that's why a downloader for AudioSet is needed. The CSV files provided by AudioSet contain only the information about the YouTube-IDs and the associated labels, but not the actual audio data. On the other hand, the TFRecord files contain the feature vectors, but not the raw audio signals, which is required for some machine learning tasks.
 
-However, using these identifiers is the only way to obtain raw audio to train a WaveGAN model for this project. 
-Gathering all samples for an entire class would take an extremely long time and be prone to human error. It would involve a number of lengthy steps which would have to be repeated every time a new data needed to be downloaded;  
-1. Parsing the CSV dataset for samples labelled with corresponding class identifier 
-
-2. Storing YouTube-IDs labelled with class identifier. 
-
-3. Putting all IDs into a separate URL addresses. 
-
-4. Downloading YouTube video from which a sample originated 
-
-5. Extract audio, discard video stream. 
-
-6. Using timestamp information in CSV file to retrieve sample. 
-
-7. Storing sample on local machine.  
-
-Since these steps are repeatable for downloading any target class in AudioSet, it made sense to automate this process. A toolkit for downloading the raw audio samples in AudioSet was developed to solve this problem. The toolkit comprises of a set of Python scripts for taking user input, parsing through the dataset, and downloading the relevant audio clips.  
-
-#### Downloading
-To download a sub-set of AudioSet, the user can specify target classes they wish to download. Then the csv files distributed for the dataset are parsed for all YouTube-IDs which have a label associated with the given class. Using a number of Python packages, URLs are formed with the YouTube-IDs. Ten second audio clips are downloaded using the generated URLs and corresponding timestamps for each video. Clips are stored locally on the user's machine for future use.  
-
-![alt text](https://github.com/aoifemcdonagh/audioset-processing/blob/master/src/pictures/audioset-processing-download.png "Download flowchart")
+By using a downloader, users can download the audio data in a raw format and use it to train their models. This tool can help to save time and effort, as the user doesn't have to manually search for and download each individual audio clip from YouTube. The user can also use the tool to filter the audio clips based on their labels, allowing them to build a custom strong label dataset that is tailored to their specific needs.
 
 ## AudioSet
 AudioSet can be downloaded from Google [here](https://research.google.com/audioset/download.html) as a set of CSV files. For each element in the dataset the CSV files list an associated YouTube ID, start time, end time and class labels. The CSV files are used to download AudioSet as raw audio files (WAV).
 
-## Structure
-```
-audioset-processing
-├── procas
-|   ├── utils.py
-|   └── download.sh
-├── data
-|   ├── balanced_train_segments.csv
-|   ├── class_labels_indices.csv
-|   ├── unbalanced_train_segments.csv
-|   └── eval_segments.csv
-├── src
-|   └── pictures
-├── demo.ipynb
-├── LICENCE
-├── process.py
-├── requirements.txt
-└── README.md
-```
+## Disclaimer
+This repository is for educational and research purposes only. Please respect the terms of use and license agreements of AudioSet when using this tool.

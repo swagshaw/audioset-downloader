@@ -1,6 +1,9 @@
-labels: ["Knock", "Baby cry, infant cry", "Fire alarm", "Fire", "Smoke detector, smoke alarm", "Car alarm", "Crash", "Breaking", "Bark", "Groan", "Screaming", "Alarm", "Gunshot"]
+labels: ["Knock", "Baby cry", "Fire alarm", "Fire", "Smoke alarm", "Crash", "Breaking", "Bark", "Groan", "Screaming", "Alarm", "Gunshot"]
+labels_id_dict: {'Knock': [ '/m/07r4wb8'], 'Baby cry': ['/t/dd00002'], 'Fire alarm': ['/m/0c3f7m'], 'Fire': ['/m/02_41'], 'Smoke alarm': ['/m/01y3hg'], 'Crash': ['/m/07pjjrj'], 'Breaking': ['/m/07pc8lb'], 'Bark': ['/m/05tny_'], 'Groan': ['/m/07s2xch'], 'Screaming': ['/m/03qc9zr'], 'Alarm': ['/m/07pp_mv'], 'Gunshot': ['/m/032s66']}
 label_file: './data/class_labels_indices.csv'
 csv_dataset: './data/unbalanced_train_segments.csv'
-workspace: './core'
-destination_dir: './output'
+workspace: '/home/xiaoyang/audioset-downloader/core'
+destination_dir: '/home/xiaoyang/audioset-downloader/output'
 fs: 16000
+eval_rate: 0.2
+num_threads: 5
