@@ -33,7 +33,7 @@ python input_label.py
 ```bash
 python main.py
 ```
-Uses CSV files found in `core/` by default. Execute `process.py` in its' own directory.
+Uses CSV files found in `core/` by default. Execute `main.py` in its' own directory.
 
 ## Configuration
 The configuration of the tool is specified in the config.yaml file. The following fields are available:
