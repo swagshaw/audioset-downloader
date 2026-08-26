@@ -10,7 +10,7 @@ This repository provides a tool to download strong label audio clips from AudioS
 ## Requirements
 - python3
 - ffmpeg
-- youtube-dl 
+- yt-dlp
 
 ## Usage
 1. Clone this repository:
@@ -23,13 +23,16 @@ git clone https://github.com/your-username/audioset-downloader.git
 ```bash
 pip install -r requirements.txt
 ```
+
+cd into core
+
 3. Run the `input_label.py` script to generate the label dictionary:
 ```bash
 python input_label.py
 ```
 4. Open the config.yaml file and paste the label dictionary that was generated in the previous step. Modify the other fields in the file as desired.
 
-5. Run the main.py script to download audio clips: Downloads audio files to a folder `output/dataset` in current directory.
+2. Run the main.py script to download audio clips: Downloads audio files to a folder `output/dataset` in current directory.
 ```bash
 python main.py
 ```

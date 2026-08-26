@@ -113,11 +113,12 @@ def _download_thread(distinct_files, data_path, logger):
             file_name = cut_tail(file)
             target_list = file_name.split('_')
             start = target_list[-1]
-            URL = 'https://www.youtube.com/watch?v={}'.format(file_name)
+            video_id = '_'.join(target_list[:-1])
+            URL = 'https://www.youtube.com/watch?v={}'.format(video_id)
             command = "ffmpeg -ss " + str(
-                start) + " -t 10 -y -i $(youtube-dl -f 'bestaudio' -g " + URL + ") -ar " + str(
+                start) + " -t 10 -y -i $(yt-dlp -f 'bestaudio' -g " + URL + ") -ar " + str(
                 16000) + " -- \"" + '{}/{}'.format(data_path, file_name) + ".wav\""
-            logger.info('COMMAND:', command)
+            logger.info(f'COMMAND: {command}')
             os.system(command)
         except Exception:
             error_count += 1
